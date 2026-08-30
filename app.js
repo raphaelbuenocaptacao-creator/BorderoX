@@ -1,0 +1,10 @@
+const login=document.getElementById('login');const dash=document.getElementById('dash');const form=document.getElementById('loginForm');const demoBtn=document.getElementById('demoBtn');const logout=document.getElementById('logout');const statusEl=document.getElementById('status');const nameEl=document.getElementById('name');
+const AUREON={baseUrl:localStorage.getItem('borderox:aureonBaseUrl')||'',project:'borderox'};
+function openDash(name='Profissional'){nameEl.textContent=name;login.classList.add('hidden');dash.classList.remove('hidden');sessionStorage.setItem('borderox:demo','1')}
+function closeDash(){dash.classList.add('hidden');login.classList.remove('hidden');sessionStorage.removeItem('borderox:demo')}
+demoBtn.addEventListener('click',()=>openDash('Raphael'));
+logout.addEventListener('click',closeDash);
+form.addEventListener('submit',async(e)=>{e.preventDefault();const email=document.getElementById('email').value.trim();const password=document.getElementById('password').value;if(!AUREON.baseUrl){statusEl.textContent='Aureon Base ainda não está publicada. Use a demonstração enquanto a API é conectada.';return}statusEl.textContent='Entrando…';try{const r=await fetch(`${AUREON.baseUrl}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password,project:AUREON.project})});if(!r.ok)throw new Error('Login não autorizado');const data=await r.json();sessionStorage.setItem('borderox:accessToken',data.accessToken||data.access_token||'');openDash(data.user?.name||email.split('@')[0])}catch(err){statusEl.textContent=err.message||'Não foi possível entrar.'}});
+if(sessionStorage.getItem('borderox:demo'))openDash('Raphael');
+let deferredPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e});
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{}));
