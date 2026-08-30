@@ -1,5 +1,5 @@
-const CACHE_NAME='borderox-v1-safe-shell';
-const STATIC_ASSETS=['./','./index.html','./manifest.webmanifest','./icon-192.svg','./icon-512.svg','./icon-512-maskable.svg'];
+const CACHE_NAME='borderox-v2-shell';
+const STATIC_ASSETS=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./icon-192.svg','./icon-512.svg','./icon-512-maskable.svg'];
 const PRIVATE_PATH_RE=/\/(api|auth|login|logout|admin|session|sessions|token|tokens|password|account|profile|me)(\/|$)/i;
 const SENSITIVE_QUERY_RE=/^(token|access_token|refresh_token|password|passwd|secret|session|auth|authorization|api_key|apikey|key|code|credential|credentials)$/i;
 function hasSensitiveQuery(url){for(const key of url.searchParams.keys())if(SENSITIVE_QUERY_RE.test(key))return true;return false}
