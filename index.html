@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="BorderoX — base PWA para análise e gestão de borderô.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BorderoX">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon-192.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon-192.svg">
+  <title>BorderoX</title>
+  <style>
+    :root{color-scheme:dark;--bg:#07101c;--panel:#0d1726;--line:#203048;--text:#f4f7fb;--muted:#9fb0c6;--accent:#79d6b1}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0,#18344d55,transparent 32%),var(--bg);color:var(--text);font:16px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif}.shell{min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(760px,100%);background:linear-gradient(180deg,#101c2d,#0b1523);border:1px solid var(--line);border-radius:24px;padding:clamp(24px,6vw,48px);box-shadow:0 30px 90px #0008}.brand{display:flex;align-items:center;gap:14px}.mark{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:var(--accent);color:#07101c;font-weight:900}.brand b{font-size:24px}.eyebrow{margin:36px 0 10px;color:var(--accent);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase}h1{margin:0;font-size:clamp(34px,8vw,68px);line-height:1.02;letter-spacing:-.04em}.copy{max-width:620px;color:var(--muted);font-size:18px;margin:20px 0 28px}.status{display:flex;flex-wrap:wrap;gap:10px}.pill{border:1px solid var(--line);background:#091421;padding:9px 12px;border-radius:999px;color:#c8d4e3;font-size:13px}.install{margin-top:28px;border:0;border-radius:12px;padding:13px 18px;background:var(--accent);color:#07101c;font-weight:800;cursor:pointer}.install[hidden]{display:none}@media(max-width:540px){.shell{padding:14px}.card{border-radius:20px}.copy{font-size:16px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="card" aria-labelledby="title">
+      <div class="brand"><div class="mark">BX</div><b>BorderoX</b></div>
+      <p class="eyebrow">Base do produto</p>
+      <h1 id="title">Borderô organizado.<br>Decisão mais rápida.</h1>
+      <p class="copy">A fundação PWA do BorderoX está pronta para receber o fluxo de análise, conferência e gestão de borderôs sem misturar dados privados ao cache offline.</p>
+      <div class="status"><span class="pill">PWA instalável</span><span class="pill">Cache seguro</span><span class="pill">Mobile first</span><span class="pill">HTTPS via produção</span></div>
+      <button id="install" class="install" hidden>Instalar BorderoX</button>
+    </section>
+  </main>
+  <script>
+    let deferredPrompt=null;const install=document.getElementById('install');
+    addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredPrompt=event;install.hidden=false});
+    install.addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;install.hidden=true});
+    addEventListener('appinstalled',()=>{deferredPrompt=null;install.hidden=true});
+    if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))addEventListener('load',async()=>{try{const registration=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});registration.update().catch(()=>{})}catch{}});
+  </script>
+</body>
+</html>
