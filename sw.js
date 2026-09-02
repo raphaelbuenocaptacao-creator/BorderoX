@@ -1,12 +1,12 @@
 const CACHE_PREFIX='borderox-';
-const CACHE_NAME='borderox-v4-safe-shell';
+const CACHE_NAME='borderox-v5-safe-shell';
 const STATIC_ASSETS=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./icon-192.svg','./icon-512.svg','./icon-512-maskable.svg'];
 const PRIVATE_PATH_RE=/\/(api|auth|login|logout|admin|session|sessions|token|tokens|password|account|profile|me)(\/|$)/i;
 const SENSITIVE_QUERY_RE=/^(token|access_token|refresh_token|password|passwd|secret|session|auth|authorization|api_key|apikey|key|code|credential|credentials)$/i;
 function hasSensitiveQuery(url){for(const key of url.searchParams.keys())if(SENSITIVE_QUERY_RE.test(key))return true;return false}
-function isPrivate(request,url){return request.method!=='GET'||request.headers.has('authorization')||request.headers.has('cookie')||url.origin!==self.location.origin||PRIVATE_PATH_RE.test(url.pathname)||hasSensitiveQuery(url)}
+function isPrivate(request,url){return request.method!=='GET'||request.headers.has('authorization')||request.headers.has('cookie')||request.headers.has('range')||url.origin!==self.location.origin||PRIVATE_PATH_RE.test(url.pathname)||hasSensitiveQuery(url)}
 function isStaticShell(request,url){if(url.search)return false;return STATIC_ASSETS.some(path=>request.url===new URL(path,self.registration.scope).href)}
-function isCacheable(response){if(!response||!response.ok||response.status===206||response.type!=='basic')return false;const cc=(response.headers.get('cache-control')||'').toLowerCase();return !cc.includes('private')&&!cc.includes('no-store')&&!response.headers.has('set-cookie')}
+function isCacheable(response){if(!response||!response.ok||response.status===206||response.type!=='basic'||response.redirected||response.headers.has('content-range'))return false;const cc=(response.headers.get('cache-control')||'').toLowerCase();return !cc.includes('private')&&!cc.includes('no-store')&&!response.headers.has('set-cookie')}
 async function precache(){const cache=await caches.open(CACHE_NAME);await Promise.all(STATIC_ASSETS.map(async path=>{try{const request=new Request(path,{credentials:'omit',cache:'reload'});const response=await fetch(request);if(isCacheable(response))await cache.put(request,response.clone())}catch{}}))}
 self.addEventListener('install',event=>{event.waitUntil(precache());self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith(CACHE_PREFIX)&&key!==CACHE_NAME).map(key=>caches.delete(key)))),self.clients.claim()]))});
